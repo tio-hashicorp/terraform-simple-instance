@@ -28,8 +28,8 @@ resource "aws_security_group" "simple-server-sg" {
     }
 
     ingress {
-       from_port = 8080
-       to_port = 8080
+       from_port = 5822
+       to_port = 5822
        protocol = "tcp"
        cidr_blocks = ["0.0.0.0/0"]
     }

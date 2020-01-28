@@ -37,4 +37,25 @@ pip3 install awscli
 echo "Get public IP..."
 export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
+mkdir -p /opt/api/
+aws s3 cp s3://hc-downloadable-assets/javaperks-customer-api-0.2.6.jar /opt/api/javaperks-customer-api-0.2.6.jar
+
+
+sudo bash -c "cat >/opt/api/config.yml" <<EOF
+logging:
+  level: INFO
+  loggers:
+    com.javaperks.api: DEBUG
+server:
+  applicationConnectors:
+  - type: http
+    port: 5822
+  adminConnectors:
+  - type: http
+    port: 9001
+vaultAddress: "http://localhost:8200"
+vaultToken: "root"
+EOF
+
+
 echo "All done!"
