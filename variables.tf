@@ -19,3 +19,7 @@ variable "instance_type" {
     description = "Instance type for the simple instance"
     default = "t3.large"
 }
+
+variable "prefix" {
+    description = "Unique prefix for naming"
+}
