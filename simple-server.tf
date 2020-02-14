@@ -11,12 +11,12 @@ resource "aws_instance" "simple-server" {
     })
 
     tags = {
-        Name = "kevin-simple-server"
+        Name = "${var.prefix}-simple-server"
     }
 }
 
 resource "aws_security_group" "simple-server-sg" {
-    name = "simple-server-sg"
+    name = "${var.prefix}-server-sg"
     description = "Simple server security group"
     vpc_id = data.aws_vpc.primary-vpc.id
 
@@ -83,17 +83,17 @@ data "aws_iam_policy_document" "simple-main-access-doc" {
 }
 
 resource "aws_iam_role" "simple-main-access-role" {
-  name               = "simple-access-role"
+  name               = "${var.prefix}-access-role"
   assume_role_policy = data.aws_iam_policy_document.simple-assume-role.json
 }
 
 resource "aws_iam_role_policy" "simple-main-access-policy" {
-  name   = "simple-access-policy"
+  name   = "${var.prefix}-access-policy"
   role   = aws_iam_role.simple-main-access-role.id
   policy = data.aws_iam_policy_document.simple-main-access-doc.json
 }
 
 resource "aws_iam_instance_profile" "simple-main-profile" {
-  name = "simple-access-profile"
+  name = "${var.prefix}-access-profile"
   role = aws_iam_role.simple-main-access-role.name
 }
