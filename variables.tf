@@ -27,3 +27,19 @@ variable "instance_type" {
 variable "prefix" {
     description = "Unique prefix for naming"
 }
+
+variable "owner" {
+    description = ""
+}
+
+variable "hc_region" {
+    description = ""
+}
+
+variable "purpose" {
+    description = ""
+}
+
+variable "ttl" {
+    description = ""
+}

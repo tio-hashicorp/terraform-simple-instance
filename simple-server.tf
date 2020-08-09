@@ -7,11 +7,16 @@ resource "aws_instance" "simple-server" {
     user_data = templatefile("${path.module}/scripts/simple-install.sh", {
         AWS_ACCESS_KEY = var.aws_access_key,
         AWS_SECRET_KEY = var.aws_secret_key,
+        AWS_SESSION_TOKEN = var.aws_session_token,
         AWS_REGION = var.aws_region
     })
 
     tags = {
         Name = "${var.prefix}-simple-server"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
     }
 }
 
@@ -40,60 +45,74 @@ resource "aws_security_group" "simple-server-sg" {
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+
+    tags = {
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
+    }
 }
 
 data "aws_iam_policy_document" "simple-assume-role" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
+    statement {
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
 
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+        principals {
+            type        = "Service"
+            identifiers = ["ec2.amazonaws.com"]
+        }
     }
-  }
 }
 
 data "aws_iam_policy_document" "simple-main-access-doc" {
-  statement {
-    sid       = "FullAccess"
-    effect    = "Allow"
-    resources = ["*"]
+    statement {
+        sid       = "FullAccess"
+        effect    = "Allow"
+        resources = ["*"]
 
-    actions = [
-        "ec2:DescribeInstances",
-        "ec2:DescribeTags",
-        "ec2messages:GetMessages",
-        "ssm:UpdateInstanceInformation",
-        "ssm:ListInstanceAssociations",
-        "ssm:ListAssociations",
-        "ecr:GetAuthorizationToken",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:GetRepositoryPolicy",
-        "ecr:DescribeRepositories",
-        "ecr:ListImages",
-        "ecr:BatchGetImage",
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:DescribeKey",
-        "s3:*"
-    ]
-  }
+        actions = [
+            "ec2:DescribeInstances",
+            "ec2:DescribeTags",
+            "ec2messages:GetMessages",
+            "ssm:UpdateInstanceInformation",
+            "ssm:ListInstanceAssociations",
+            "ssm:ListAssociations",
+            "ecr:GetAuthorizationToken",
+            "ecr:BatchCheckLayerAvailability",
+            "ecr:GetDownloadUrlForLayer",
+            "ecr:GetRepositoryPolicy",
+            "ecr:DescribeRepositories",
+            "ecr:ListImages",
+            "ecr:BatchGetImage",
+            "kms:Encrypt",
+            "kms:Decrypt",
+            "kms:DescribeKey",
+            "s3:*"
+        ]
+    }
 }
 
 resource "aws_iam_role" "simple-main-access-role" {
-  name               = "${var.prefix}-access-role"
-  assume_role_policy = data.aws_iam_policy_document.simple-assume-role.json
+    name               = "${var.prefix}-access-role"
+    assume_role_policy = data.aws_iam_policy_document.simple-assume-role.json
+
+    tags = {
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
+    }
 }
 
 resource "aws_iam_role_policy" "simple-main-access-policy" {
-  name   = "${var.prefix}-access-policy"
-  role   = aws_iam_role.simple-main-access-role.id
-  policy = data.aws_iam_policy_document.simple-main-access-doc.json
+    name   = "${var.prefix}-access-policy"
+    role   = aws_iam_role.simple-main-access-role.id
+    policy = data.aws_iam_policy_document.simple-main-access-doc.json
 }
 
 resource "aws_iam_instance_profile" "simple-main-profile" {
-  name = "${var.prefix}-access-profile"
-  role = aws_iam_role.simple-main-access-role.name
+    name = "${var.prefix}-access-profile"
+    role = aws_iam_role.simple-main-access-role.name
 }
