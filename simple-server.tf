@@ -116,3 +116,5 @@ resource "aws_iam_instance_profile" "simple-main-profile" {
     name = "${var.prefix}-access-profile"
     role = aws_iam_role.simple-main-access-role.name
 }
+
+
