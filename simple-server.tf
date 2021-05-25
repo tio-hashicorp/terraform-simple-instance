@@ -13,7 +13,8 @@ resource "aws_instance" "simple-server" {
 
     tags = {
         Name = "${var.prefix}-simple-server"
-        Owner = var.owner
+        Department = var.owner
+        Billable = "yes"
         Region = var.hc_region
         Purpose = var.purpose
         TTL = var.ttl
